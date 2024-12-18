@@ -13,7 +13,7 @@ import Home from './components/Home.jsx'
 import AddPost from './components/AddPost.jsx'
 // import MyPost from './component/MyPost.jsx'
 // import EditPost from './component/EditPost.jsx'
-import AuthLayout from "./components/AuthLayout.jsx"
+import AuthLayout from "./components/authLayout.jsx";
 import PostDetails from './components/PostDetails.jsx'
 import MyPosts from './components/MyPosts.jsx'
 import EditPost from './components/EditPost.jsx'
