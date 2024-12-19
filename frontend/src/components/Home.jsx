@@ -55,9 +55,10 @@ const Home = () => {
               className="bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden transition-transform transform hover:scale-105 hover:shadow-xl group"
             >
               <img
-                src={post?.featuredImg}
+                src={`${post?.featuredImg}?q_auto:low&w_800`}
                 alt={post.title}
                 className="h-[225px] w-full object-cover rounded-t-md"
+                  loading="lazy"
               />
               <div className="p-4">
                 <h3 className="text-xl font-semibold text-gray-800 truncate">
