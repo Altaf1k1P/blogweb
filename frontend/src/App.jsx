@@ -9,7 +9,7 @@ function App() {
       <Header />
 
       {/* Main Content */}
-      <main className="flex-1 min-w-full">
+      <main className="flex-1 min-w-full min-h-[720px]">
         <Outlet />
       </main>
 

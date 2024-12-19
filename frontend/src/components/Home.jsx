@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPosts } from "../store/postSlice";
+import { fetchPosts, resetPosts } from "../store/postSlice"; // Import resetPosts action
 import { Link } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 
@@ -8,6 +8,7 @@ const Home = () => {
   const dispatch = useDispatch();
   const { posts, loading, currentPage, hasMore, error } = useSelector((state) => state.post);
 
+  // Load more posts when user scrolls to the bottom of the page
   const loadMorePosts = useCallback(() => {
     if (!loading && hasMore) {
       dispatch(fetchPosts({ page: currentPage, limit: 10 })); // Load next page
@@ -15,12 +16,22 @@ const Home = () => {
   }, [dispatch, loading, hasMore, currentPage]);
 
   useEffect(() => {
-    // Load the initial page of posts
+    // Reset posts state when the component mounts to ensure a fresh load
+    dispatch(resetPosts());
     dispatch(fetchPosts({ page: 1, limit: 10 }));
+
+    return () => {
+      // Optionally reset posts when the component unmounts
+      dispatch(resetPosts());
+    };
   }, [dispatch]);
 
   const handleScroll = () => {
-    if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 50 && !loading) {
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.offsetHeight - 50 &&
+      !loading
+    ) {
       loadMorePosts();
     }
   };
@@ -55,7 +66,7 @@ const Home = () => {
               src={`${post?.featuredImg}?q_auto:low&w_800`}
               alt={post.title}
               className="h-[225px] w-full object-cover rounded-t-md"
-               loading="lazy"
+              loading="lazy"
             />
             <div className="p-4">
               <h3 className="text-xl font-semibold text-gray-800 truncate">{post.title}</h3>
@@ -83,9 +94,11 @@ const Home = () => {
               </div>
             </div>
           ))}
+
       </div>
 
-      {!hasMore && !loading && (
+      {/* Display "No More Posts" message */}
+      {!hasMore && !loading && posts.length > 0 && (
         <div className="text-center mt-6">
           <p className="text-gray-500">No more posts to load.</p>
         </div>

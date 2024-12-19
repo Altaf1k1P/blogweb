@@ -8,10 +8,17 @@ export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
   async ({ page, limit }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/posts?page=${page}&limit=${limit}`);
-      return response.data.data; // Adjust based on your API response
+      const response = await API.get("/home", { params: { page, limit } });
+     // console.log("Fetching posts:", response.data);
+
+      // Ensure that response.data.message is an array of posts
+      if (Array.isArray(response.data.message)) {
+        return response.data.message;
+      } else {
+        return rejectWithValue("Invalid response format");
+      }
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data?.message || "Failed to fetch posts");
     }
   }
 );
@@ -35,8 +42,6 @@ export const fetchPostById = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await API.get(`/post/${id}`);
-      //console.log("api response: " , response.data);
-      
       return response.data.message; // Assuming this is a single post object
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch single post");
@@ -63,7 +68,7 @@ export const editPost = createAsyncThunk(
   async ({ id, postData }, { rejectWithValue }) => {
     try {
       const response = await API.patch(`/post/${id}`, postData);
-      return response.data.message; // Return the updated post object
+      return response.data.message; // Assuming this is the updated post object
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to edit post");
     }
@@ -124,8 +129,22 @@ const postSlice = createSlice({
       })
       .addCase(fetchPosts.fulfilled, (state, action) => {
         state.loading = false;
-        state.posts = [...state.posts, ...action.payload.docs]; // Append new posts
-        state.hasMore = action.payload.docs.length > 0; // Check if more data exists
+       // console.log("Response from API:", action.payload);
+
+        // Check for duplicates before adding new posts
+        const existingPosts = state.posts.map(post => post._id); // Array of existing post IDs
+        const newPosts = action.payload.filter(newPost => 
+          !existingPosts.includes(newPost._id) // Check if new post ID is not in existing posts
+        );
+
+        //console.log('existing posts:', existingPosts);
+        //console.log('new posts:', newPosts); // Log new posts to verify the filtering
+
+        // Add the new posts (that are not duplicates)
+        state.posts = [...state.posts, ...newPosts];
+
+        // Check if there are more posts to load
+        state.hasMore = action.payload.length > 0;
       })
       .addCase(fetchPosts.rejected, (state, action) => {
         state.loading = false;
@@ -162,9 +181,10 @@ const postSlice = createSlice({
 
       // Add Post
       .addCase(addPost.fulfilled, (state, { payload }) => {
-        state.posts.unshift(payload);
+        state.posts.unshift(payload); // Add the new post to the beginning
       })
 
+      // Edit Post
       .addCase(editPost.fulfilled, (state, { payload }) => {
         state.posts = state.posts.map((post) =>
           post._id === payload._id ? payload : post
@@ -173,12 +193,10 @@ const postSlice = createSlice({
       })
 
       // Delete Post
-     // Delete Post
-.addCase(deletePost.fulfilled, (state, { payload }) => {
-  state.myPosts = state.myPosts.filter((post) => post._id !== payload);
-  state.posts = state.posts.filter((post) => post._id !== payload); // Optional: Remove from all posts if needed
-})
-
+      .addCase(deletePost.fulfilled, (state, { payload }) => {
+        state.myPosts = state.myPosts.filter((post) => post._id !== payload);
+        state.posts = state.posts.filter((post) => post._id !== payload); // Optional: Remove from all posts if needed
+      })
 
       // Toggle Publish Status
       .addCase(togglePublishStatus.fulfilled, (state, { payload }) => {
@@ -197,5 +215,7 @@ const postSlice = createSlice({
       );
   },
 });
+
+export const { resetPosts } = postSlice.actions;
 
 export default postSlice.reducer;
