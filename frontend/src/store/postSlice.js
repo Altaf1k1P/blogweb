@@ -4,14 +4,14 @@ import API from "../helper/axiosInstance";
 // Async Thunks
 
 // Fetch All Posts
-export const fetchAllPosts = createAsyncThunk(
-  "posts/fetchAll",
-  async (_, { rejectWithValue }) => {
+export const fetchPosts = createAsyncThunk(
+  "posts/fetchPosts",
+  async ({ page, limit }, { rejectWithValue }) => {
     try {
-      const response = await API.get("/home");
-      return response.data.message.docs; // Ensure this is the expected array of posts
+      const response = await axios.get(`/api/posts?page=${page}&limit=${limit}`);
+      return response.data.data; // Adjust based on your API response
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to fetch posts");
+      return rejectWithValue(error.response.data);
     }
   }
 );
@@ -103,24 +103,33 @@ const postSlice = createSlice({
     posts: [],
     currentPost: null, // Separate state for a single post
     myPosts: [], // User's posts
+    currentPage: 1,
+    hasMore: true,
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    resetPosts(state) {
+      state.posts = [];
+      state.currentPage = 1;
+      state.hasMore = true;
+    },
+  },
   extraReducers: (builder) => {
     builder
       // Fetch All Posts
-      .addCase(fetchAllPosts.pending, (state) => {
+      .addCase(fetchPosts.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchAllPosts.fulfilled, (state, { payload }) => {
+      .addCase(fetchPosts.fulfilled, (state, action) => {
         state.loading = false;
-        state.posts = payload;
+        state.posts = [...state.posts, ...action.payload.docs]; // Append new posts
+        state.hasMore = action.payload.docs.length > 0; // Check if more data exists
       })
-      .addCase(fetchAllPosts.rejected, (state, { payload }) => {
+      .addCase(fetchPosts.rejected, (state, action) => {
         state.loading = false;
-        state.error = payload;
+        state.error = action.payload || "Failed to fetch posts";
       })
 
       // Fetch User's Posts
