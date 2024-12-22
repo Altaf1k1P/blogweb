@@ -91,7 +91,9 @@ const addPost = asyncHandler(async (req, res) => {
   const post = await Post.create({
     title,
     content,
-    tags: tags?.split(",").map((tag) => tag.trim()).filter(Boolean) || [],
+    tags: Array.isArray(tags)
+    ? tags.flatMap((tag) => tag.split(" ").map((t) => t.trim()).filter(Boolean))
+    : [],
     featuredImg: featuredImgUrl ? featuredImgUrl.url : null,
     owner: req.user._id,
     isPublished: isPublished || false,
@@ -120,9 +122,9 @@ const editPost = asyncHandler(async (req, res) => {
 
   post.title = title || post.title;
   post.content = content || post.content;
-  post.tags = tags
-    ? tags.split(",").map((tag) => tag.trim()).filter(Boolean)
-    : post.tags;
+  post.tags = Array.isArray(tags)
+  ? tags.flatMap((tag) => tag.split(" ").map((t) => t.trim()).filter(Boolean))
+  : [];
 
   await post.save();
 

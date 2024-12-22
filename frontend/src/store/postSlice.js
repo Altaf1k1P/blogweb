@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API from "../helper/axiosInstance";
 
+
 // Async Thunks
 
 // Fetch All Posts
@@ -29,6 +30,7 @@ export const fetchMyPosts = createAsyncThunk(
   async (userId, { rejectWithValue }) => {
     try {
       const response = await API.get(`/myposts/${userId}`);
+      //console.log("Fetching posts:", response.data);
       return response.data.message; // Assuming this is an array of posts
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch user posts");
@@ -68,6 +70,8 @@ export const editPost = createAsyncThunk(
   async ({ id, postData }, { rejectWithValue }) => {
     try {
       const response = await API.patch(`/post/${id}`, postData);
+      console.log("Updated post", response.data.message);
+      
       return response.data.message; // Assuming this is the updated post object
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to edit post");

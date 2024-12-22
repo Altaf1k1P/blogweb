@@ -16,6 +16,8 @@ const EditPost = () => {
   const [isPublished, setIsPublished] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
+  //console.log("id",id);
+  
 
   useEffect(() => {
     // Fetch the post data if it's not already loaded
