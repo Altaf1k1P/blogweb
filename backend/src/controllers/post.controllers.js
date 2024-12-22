@@ -104,7 +104,7 @@ const addPost = asyncHandler(async (req, res) => {
 
 // Edit an existing post
 const editPost = asyncHandler(async (req, res) => {
-  const { title, content, tags } = req.body;
+  const { title, content, tags, isPublished } = req.body;
   const { id } = req.params;
 
   if (!isValidObjectId(id)) {
@@ -120,16 +120,21 @@ const editPost = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Unauthorized to edit this post");
   }
 
+  // Update fields only if provided
   post.title = title || post.title;
   post.content = content || post.content;
+  post.isPublished = typeof isPublished === "boolean" ? isPublished : post.isPublished;
+
+  // Process tags
   post.tags = Array.isArray(tags)
-  ? tags.flatMap((tag) => tag.split(" ").map((t) => t.trim()).filter(Boolean))
-  : [];
+    ? tags.flatMap((tag) => tag.split(" ").map((t) => t.trim()).filter(Boolean))
+    : post.tags;
 
   await post.save();
 
   res.status(200).json(new ApiResponse(200, post, "Post updated successfully"));
 });
+
 
 // Delete a post
 const deletePost = asyncHandler(async (req, res) => {

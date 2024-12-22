@@ -70,7 +70,7 @@ export const editPost = createAsyncThunk(
   async ({ id, postData }, { rejectWithValue }) => {
     try {
       const response = await API.patch(`/post/${id}`, postData);
-      console.log("Updated post", response.data.message);
+      //console.log("Updated post", response.data.message);
       
       return response.data.message; // Assuming this is the updated post object
     } catch (error) {
