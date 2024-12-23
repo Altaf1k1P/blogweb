@@ -25,11 +25,11 @@ const PostDetails = () => {
       {post && (
         <>
           {/* Image */}
-          <div className="w-full p-10">
+          <div className="flex justify-center w-full  p-10">
             <img
               src={post.featuredImg || "https://via.placeholder.com/800x400"}
               alt={post.title}
-              className="w-full h-full object-cover rounded-lg"
+              className="w-auto h-auto max-h-[720px] object-cover rounded-lg"
             />
           </div>
 
