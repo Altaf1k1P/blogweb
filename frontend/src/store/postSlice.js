@@ -10,8 +10,9 @@ export const fetchPosts = createAsyncThunk(
   async ({ page, limit }, { rejectWithValue }) => {
     try {
       const response = await API.get("/home", { params: { page, limit } });
-      const data = response.data?.data || response.data?.message;
-      if (Array.isArray(data)) {
+      const res = response.data;
+      const data = Array.isArray(res) ? res : (Array.isArray(res?.data) ? res.data : (Array.isArray(res?.message) ? res.message : null));
+      if (data) {
         return data;
       } else {
         return rejectWithValue("Invalid response format");
@@ -28,7 +29,8 @@ export const fetchMyPosts = createAsyncThunk(
   async (userId, { rejectWithValue }) => {
     try {
       const response = await API.get(`/myposts/${userId}`);
-      return response.data?.data || response.data?.message;
+      const res = response.data;
+      return Array.isArray(res) ? res : (Array.isArray(res?.data) ? res.data : (Array.isArray(res?.message) ? res.message : []));
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch user posts");
     }
@@ -41,7 +43,16 @@ export const fetchPostById = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await API.get(`/post/${id}`);
-      return response.data?.data || response.data?.message;
+      const res = response.data;
+      if (res && typeof res === "object") {
+        if (res.data && typeof res.data === "object" && !Array.isArray(res.data)) {
+          return res.data;
+        }
+        if (res.message && typeof res.message === "object" && !Array.isArray(res.message)) {
+          return res.message;
+        }
+      }
+      return res;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch single post");
     }
