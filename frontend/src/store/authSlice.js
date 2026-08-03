@@ -73,7 +73,7 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.isAuthenticated = true;
-        state.user = payload.user;
+        state.user = payload.data?.user || payload.user;
       })
       .addCase(login.rejected, (state, { payload }) => {
         state.loading = false;
@@ -82,7 +82,7 @@ const authSlice = createSlice({
 
       // Handle Signup
       .addCase(createAccount.fulfilled, (state) => {
-        state.error = null; // Clear error (if any) on successful signup
+        state.error = null;
       })
 
       // Handle Logout
@@ -94,8 +94,9 @@ const authSlice = createSlice({
       // Fetch Current User
       .addCase(getCurrentUser.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.user = payload;
-        state.isAuthenticated = !!payload; // Mark authenticated if payload exists
+        const userData = payload.data || payload;
+        state.user = userData;
+        state.isAuthenticated = !!userData;
       })
 
       // Catch All Rejected Cases

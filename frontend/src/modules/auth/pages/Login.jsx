@@ -26,7 +26,10 @@ export default function Login() {
 
     try {
       const response = await dispatch(login(formData)).unwrap();
-      const accessToken = response.data?.accessToken || response.accessToken;
+      const accessToken = 
+        response.data?.accessToken || 
+        response.accessToken || 
+        response.data?.data?.accessToken;
       if (accessToken) {
         localStorage.setItem("accessToken", accessToken);
         navigate("/");

@@ -10,11 +10,9 @@ export const fetchPosts = createAsyncThunk(
   async ({ page, limit }, { rejectWithValue }) => {
     try {
       const response = await API.get("/home", { params: { page, limit } });
-     // console.log("Fetching posts:", response.data);
-
-      // Ensure that response.data.message is an array of posts
-      if (Array.isArray(response.data.message)) {
-        return response.data.message;
+      const data = response.data?.data || response.data?.message;
+      if (Array.isArray(data)) {
+        return data;
       } else {
         return rejectWithValue("Invalid response format");
       }
@@ -30,8 +28,7 @@ export const fetchMyPosts = createAsyncThunk(
   async (userId, { rejectWithValue }) => {
     try {
       const response = await API.get(`/myposts/${userId}`);
-      //console.log("Fetching posts:", response.data);
-      return response.data.message; // Assuming this is an array of posts
+      return response.data?.data || response.data?.message;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch user posts");
     }
@@ -44,7 +41,7 @@ export const fetchPostById = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await API.get(`/post/${id}`);
-      return response.data.message; // Assuming this is a single post object
+      return response.data?.data || response.data?.message;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch single post");
     }
@@ -57,7 +54,7 @@ export const addPost = createAsyncThunk(
   async (postData, { rejectWithValue }) => {
     try {
       const response = await API.post("/add-post", postData);
-      return response.data; // Assuming this is the created post object
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to add post");
     }
@@ -70,9 +67,7 @@ export const editPost = createAsyncThunk(
   async ({ id, postData }, { rejectWithValue }) => {
     try {
       const response = await API.patch(`/post/${id}`, postData);
-      //console.log("Updated post", response.data.message);
-      
-      return response.data.message; // Assuming this is the updated post object
+      return response.data?.data || response.data?.message || response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to edit post");
     }
@@ -98,7 +93,7 @@ export const togglePublishStatus = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await API.put(`/add-post/${id}/publish`);
-      return response.data; // Assuming this is the updated post object
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to toggle publish status");
     }
