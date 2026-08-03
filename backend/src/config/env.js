@@ -4,7 +4,7 @@ dotenv.config();
 export const ENV = {
   PORT: process.env.PORT || 8080,
   MONGODB_URI: process.env.MONGODB_URI,
-  CORS_ORIGIN: (process.env.CORS_ORIGIN || "http://localhost:5173").trim(),
+  CORS_ORIGIN: (process.env.CORS_ORIGIN || "http://localhost:5173").trim().replace(/\/$/, ""),
   ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET || "access_secret",
   ACCESS_TOKEN_EXPIRY: process.env.ACCESS_TOKEN_EXPIRY || "1d",
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET || "refresh_secret",
