@@ -1,0 +1,28 @@
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px var(--accent-glow);
+  }
+  50% {
+    box-shadow: 0 0 30px var(--accent-glow);
+  }
+}
+
+@keyframes gridPan {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+.animate-glow {
+  animation: glowPulse 4s infinite ease-in-out;
+}
+
+.bg-grid-glow {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, var(--border-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border-color) 1px, transparent 1px);
+}

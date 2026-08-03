@@ -1,38 +1,45 @@
 import express from 'express';
 import cors from 'cors';
-import cookieParser  from "cookie-parser";
-import morgan from "morgan";
+import cookieParser from "cookie-parser";
+import compression from "compression";
+import responseTime from "response-time";
+import { ENV } from './config/env.js';
+import { requestLogger } from './middleware/requestLogger.middleware.js';
+import { securityMiddleware } from './middleware/security.middleware.js';
+import { generalLimiter } from './middleware/rateLimiter.middleware.js';
+import { errorHandler } from './middleware/error.middleware.js';
+import { notFound } from './middleware/notFound.middleware.js';
+import rootRouter from './routes/index.js';
 
 const app = express();
 
-// Logging middleware 
-app.use(morgan('dev'));
+// Security headers and configurations
+app.use(securityMiddleware());
 
-// Enable JSON parsing middleware for all routes
-
-app.use(express.json({ limit: '16kb' }));
-
-// Enable CORS for all routes
-
+// CORS configuration
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,  // Replace with your frontend URL
-    credentials: true, // Allow cookies to be sent in requests and responses  // some legacy browsers (IE11, various older browsers) choke on 204
-    methods: ["GET", "POST", "PATCH", "DELETE"],
+  origin: ENV.CORS_ORIGIN,
+  credentials: true,
+  methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
 }));
-app.use(express.urlencoded({
-    extended: true,
-    limit: "16kb"
-}))
 
-app.use(express.static("public"))
-// Enable cookie-parser middleware
+// Standard Middlewares
+app.use(responseTime());
+app.use(requestLogger);
+app.use(compression());
+app.use(express.json({ limit: '16kb' }));
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+app.use(express.static("public"));
 app.use(cookieParser());
 
+// General API rate limiting
+app.use("/api", generalLimiter);
 
- import userRouter from './routes/user.routes.js';
- import postRouter from './routes/post.routes.js';
+// Root Router Registry
+app.use('/api', rootRouter);
 
- app.use('/api/auth', userRouter);
- app.use('/api', postRouter);
+// Fallbacks and Error Handlers
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;

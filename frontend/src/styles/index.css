@@ -1,0 +1,30 @@
+@import "./variables.css";
+@import "./animations.css";
+@import "./scrollbar.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+  }
+}
+
+.react-loading-skeleton {
+  background-color: var(--border-color) !important;
+  opacity: 0.6;
+}
+
+/* Glassmorphism utility */
+.glass-effect {
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+}

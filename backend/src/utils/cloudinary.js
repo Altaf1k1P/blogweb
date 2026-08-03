@@ -15,8 +15,8 @@ const uploadOnCloudinary = async (localFilePath) => {
   try {
     const response = await cloudinary.uploader.upload(localFilePath, {
       folder: "blog_images",
-      resource_type: "auto",
-      quality: "auto:low", // Automatically adjust quality to reduce size
+      resource_type: "webp",
+      quality: "auto:good", // Automatically adjust quality to reduce size
       width: 800, // Resize to a maximum width of 800px
       crop: "scale",
     });

@@ -1,19 +1,27 @@
-import dotenv from "dotenv"
-import connectDB from "./db/index.js"
-import app from "./app.js"
+import connectDB from "./config/db.js";
+import { ENV } from "./config/env.js";
+import { cacheManager } from "./cache/cache.manager.js";
+import app from "./app.js";
+import { logger } from "./utils/logger.js";
 
-dotenv.config({
-    path: './.env'
-})
+// Initialize cache manager and database connection
+const bootstrap = async () => {
+  try {
+    // 1. Connect MongoDB
+    await connectDB();
 
+    // 2. Initialize Redis/Fallback Cache
+    await cacheManager.init();
 
-connectDB()
-.then(()=>{
-    app.listen(process.env.PORT || 8000, ()=>{
-        console.log(`Server is running on port: ${process.env.PORT}`);
-    })
-})
+    // 3. Start express listener
+    const PORT = ENV.PORT || 8080;
+    app.listen(PORT, () => {
+      logger.info(`Server is running on port: ${PORT}`);
+    });
+  } catch (error) {
+    logger.error('Failed to bootstrap server components:', error);
+    process.exit(1);
+  }
+};
 
-.catch((error)=>{
-    console.log('Failed to connect to the MongoDB', error);
-});
+bootstrap();
