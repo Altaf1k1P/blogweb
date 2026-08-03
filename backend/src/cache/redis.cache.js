@@ -10,9 +10,20 @@ class RedisCache {
 
   async connect() {
     try {
-      this.client = createClient({ url: ENV.REDIS_URL });
+      this.client = createClient({
+        url: ENV.REDIS_URL,
+        socket: {
+          reconnectStrategy: (retries) => {
+            if (retries >= 3) {
+              // Stop reconnect attempts to prevent flooding log outputs
+              return false;
+            }
+            return 2000; // Retry after 2 seconds
+          }
+        }
+      });
       this.client.on("error", (err) => {
-        logger.error("Redis Client Error", err.message);
+        logger.error("Redis Client Error:", err.message);
         this.isConnected = false;
       });
       this.client.on("connect", () => {
