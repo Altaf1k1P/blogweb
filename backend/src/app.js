@@ -17,8 +17,26 @@ const app = express();
 app.use(securityMiddleware());
 
 // CORS configuration
+const allowedOrigins = [
+  ENV.CORS_ORIGIN,
+  "http://localhost:5173",
+  "https://blogweb-coral.vercel.app"
+];
+
 app.use(cors({
-  origin: ENV.CORS_ORIGIN,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    
+    const isAllowed = allowedOrigins.includes(origin) || 
+                      origin.endsWith(".vercel.app") || 
+                      origin.startsWith("http://localhost:");
+                      
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
 }));
