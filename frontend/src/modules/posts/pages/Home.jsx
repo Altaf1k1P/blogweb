@@ -77,7 +77,7 @@ export default function Home() {
       )}
 
       {/* Posts Grid */}
-      {posts.length === 0 && !loading ? (
+      {!error && posts.length === 0 && !loading ? (
         <EmptyState
           title="No articles posted"
           description="It looks like there are no published posts yet. Be the first to write something!"
