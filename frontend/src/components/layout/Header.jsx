@@ -11,6 +11,8 @@ export default function Header() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const isLogged = isAuthenticated && !!localStorage.getItem("accessToken");
+
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
@@ -36,7 +38,7 @@ export default function Header() {
           <NavLink to="/" end className={navItemClass}>
             Home
           </NavLink>
-          {isAuthenticated ? (
+          {isLogged ? (
             <>
               <NavLink to={`/my-post/${user?.userId}`} className={navItemClass}>
                 My Posts
@@ -94,7 +96,7 @@ export default function Header() {
           >
             Home
           </NavLink>
-          {isAuthenticated ? (
+          {isLogged ? (
             <>
               <NavLink
                 to={`/my-post/${user?.userId}`}

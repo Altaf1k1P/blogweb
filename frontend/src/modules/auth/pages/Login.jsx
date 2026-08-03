@@ -28,6 +28,7 @@ export default function Login() {
       const response = await dispatch(login(formData)).unwrap();
       const accessToken = 
         response.data?.accessToken || 
+        response.message?.accessToken || 
         response.accessToken || 
         response.data?.data?.accessToken;
       if (accessToken) {
